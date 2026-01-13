@@ -1,6 +1,11 @@
 package validatorfx
 
-import "github.com/go-playground/validator/v10"
+import (
+	"reflect"
+	"strings"
+
+	"github.com/go-playground/validator/v10"
+)
 
 type Validator = validator.Validate
 
@@ -8,5 +13,15 @@ type Validator = validator.Validate
 // WithRequiredStructEnabled ensures the "required" family of tags (e.g., required, required_if)
 // apply to non-pointer struct fields, treating their zero values as invalid.
 func New() *Validator {
-	return validator.New(validator.WithRequiredStructEnabled())
+	v := validator.New(validator.WithRequiredStructEnabled())
+	v.RegisterTagNameFunc(func(fld reflect.StructField) string {
+		//nolint:mnd //fixed length
+		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
+		if name == "-" {
+			return ""
+		}
+		return name
+	})
+
+	return v
 }
