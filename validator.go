@@ -20,6 +20,9 @@ func New() *Validator {
 		if name == "-" {
 			return ""
 		}
+		if name == "" {
+			return fld.Name
+		}
 		return name
 	})
 
